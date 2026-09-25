@@ -45,7 +45,7 @@ class IngestCommand extends Command
     /**
      * Split text into chunks on paragraph boundaries.
      *
-     * ponytail: splits on blank lines and packs up to $max characters. Good enough for
+     * Note: splits on blank lines and packs up to $max characters. Good enough for
      * markdown prose; swap in a token-aware splitter if chunks start cutting mid-sentence.
      *
      * @return array<int, string>
