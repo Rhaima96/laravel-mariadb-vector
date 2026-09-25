@@ -1,0 +1,21 @@
+services:
+  mariadb:
+    image: mariadb:12.3
+    environment:
+      MARIADB_ROOT_PASSWORD: secret
+      MARIADB_DATABASE: vectordemo
+      MARIADB_USER: vector
+      MARIADB_PASSWORD: secret
+    ports:
+      # 3308 on the host, so a local MySQL on 3306 keeps working.
+      - '3308:3306'
+    volumes:
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mariadb:
