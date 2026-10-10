@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Agents\DocsAgent;
 use App\Models\Document;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class AskCommand extends Command
 {
@@ -17,17 +16,7 @@ class AskCommand extends Command
     {
         $question = $this->argument('question');
 
-        // Embed the question once, then reuse the vector for both the distance
-        // column and the filter. Passing the string directly would work too --
-        // the query builder embeds it through laravel/ai -- but that bills twice.
-        $vector = Str::of($question)->toEmbeddings();
-
-        $matches = Document::query()
-            ->select('id', 'source', 'content')
-            ->selectVectorDistance('embedding', $vector, as: 'distance')
-            ->whereVectorSimilarTo('embedding', $vector, minSimilarity: (float) $this->option('similarity'))
-            ->limit((int) $this->option('matches'))
-            ->get();
+        $matches = Document::search($question, (int) $this->option('matches'), (float) $this->option('similarity'));
 
         if ($matches->isEmpty()) {
             $this->warn('Nothing similar enough. Lower --similarity or ingest more content.');

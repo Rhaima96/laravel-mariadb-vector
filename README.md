@@ -42,6 +42,22 @@ Set your key in `.env`:
 OPENAI_API_KEY=sk-...
 ```
 
+## HTTP endpoint
+
+The same retrieval is available over HTTP:
+
+```bash
+php artisan serve
+curl -s -X POST localhost:8000/api/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"why should I not use the mysql driver with MariaDB?"}'
+```
+
+It returns `{"answer": "...", "sources": [{"source": "...", "distance": 0.329}]}`,
+`422` if `question` is missing, and `404` if nothing in the ingested documents is
+similar enough. The route is throttled to 10 requests per minute because every call
+spends embedding and chat tokens.
+
 ## The database side
 
 ```php
