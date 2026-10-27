@@ -85,6 +85,31 @@ protected function casts(): array
 }
 ```
 
+## Local embeddings with Ollama
+
+The embeddings can come from a local model instead of OpenAI, so the text of your
+documents never leaves your machine during ingestion. Only the embeddings become
+local: the agent that writes the answer still uses the chat provider from
+`config/ai.php`. Tested with `nomic-embed-text` (768 dimensions) on MariaDB 12.3:
+
+```bash
+brew install ollama && brew services start ollama
+ollama pull nomic-embed-text
+php artisan vendor:publish --tag=ai-config
+```
+
+1. In `config/ai.php`, set `'default_for_embeddings' => 'ollama'`.
+2. In the migration, change `vector('embedding', 1536)` to `vector('embedding', 768)`.
+3. Rebuild and re-ingest: `php artisan migrate:fresh && php artisan ingest`.
+4. Raise the cut-off: distances are not on the same scale from one model to another.
+   With `nomic-embed-text`, relevant passages sit at 0.23 to 0.38 but an unrelated
+   question still matches at 0.64 to 0.66, so the default `0.25` never returns a
+   404. Use `--similarity=0.45` with `ask`, or raise the default in
+   `Document::search()`.
+
+A table must hold the vectors of one model only: if you switch models, re-ingest.
+Set `OLLAMA_URL` in `.env` if Ollama runs on another machine.
+
 ## Things worth knowing
 
 **Use the `mariadb` driver, never `mysql`.** Against a MariaDB server, the `mysql`
@@ -105,4 +130,4 @@ is deliberately permissive for a three-file corpus. Raise it as the corpus grows
 
 ## License
 
-MIT
+MIT (see the `LICENSE` file).
