@@ -6,6 +6,9 @@ embeddings and the application data living in the same MariaDB database.
 Everything here uses what Laravel 13 and `laravel/ai` already provide. There is no
 custom SQL, no glue package, and no vector service to run alongside the database.
 
+A step-by-step tutorial for this app is on mariadb.org:
+[Build an "ask the docs" app with Laravel 13 and MariaDB Vector](https://mariadb.org/build-an-ask-the-docs-app-with-laravel-13-and-mariadb-vector/).
+
 ## What it does
 
 `php artisan ingest` splits the markdown files in `content/` into chunks, turns
